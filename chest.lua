@@ -19,7 +19,7 @@ minetest.register_node("landrush:shared_chest", {
 			meta:set_string("formspec",default.chest_formspec)
 			meta:set_string("infotext", "Shared Chest")
 			local inv = meta:get_inventory()
-			inv:set_size("main", 8*4)
+			inv:set_size("main", 8*5)
 		end,
 		
 		allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
@@ -93,17 +93,17 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	type = 'shapeless',
 	output = 'landrush:shared_chest',
 	recipe = {
-		{'landrush:landclaim'},
-		{'default:chest'}
+		'landrush:landclaim', 'default:chest'
 	}
 })
 
 minetest.register_craft({
+	type = 'shapeless',
 	output = 'landrush:shared_chest',
 	recipe = {
-		{'landrush:landclaim'},
-		{'default:chest_locked'}
+		'landrush:landclaim', 'default:chest_locked'
 	}
 })

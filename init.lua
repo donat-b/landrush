@@ -1,10 +1,4 @@
-minetest.log('action','Loading Land Rush Land Claim')
-
--- Freeminer Compatibility
-if freeminer then
-	minetest = freeminer
-end
-
+local load_time_start = os.clock()
 landrush = {}
 
 local path = minetest.get_modpath("landrush")
@@ -25,44 +19,49 @@ minetest.register_privilege("landrush", "Allows player to dig and build anywhere
 
 landrush.load_claims()
 
-	minetest.register_node("landrush:landclaim", {
-		description = "Land Rush Land Claim",
-		tiles = {"landrush_landclaim.png"},
-		groups = {oddly_breakable_by_hand=2},
-		on_place = function(itemstack, placer, pointed_thing)
-			owner = landrush.get_owner(pointed_thing.above)
-			player = placer:get_player_name()
+minetest.register_node("landrush:landclaim", {
+	description = "Land Rush Land Claim",
+	tiles = {"landrush_landclaim.png"},
+	groups = {oddly_breakable_by_hand=2},
+	on_place = function(itemstack, placer, pointed_thing)
+		owner = landrush.get_owner(pointed_thing.above)
+		player = placer:get_player_name()
 
-			if player:find("[gG]uest") then
-				minetest.chat_send_player(player,"Guests cannot claim land")
-				return itemstack
-			end
-			
-			if ( pointed_thing.above.y < -200 ) then
-				minetest.chat_send_player(player,"You cannot claim below -200")
-				return itemstack
-			end
-			
-			if owner then
-				minetest.chat_send_player(player, "This area is already owned by "..owner)
-			else
-				minetest.env:remove_node(pointed_thing.above)
-				chunk = landrush.get_chunk(pointed_thing.above)
-				landrush.claims[chunk] = {owner=placer:get_player_name(),shared={},claimtype="landclaim"}
-				landrush.save_claims()
-				minetest.chat_send_player(landrush.claims[chunk].owner, "You now own this area.")
-				itemstack:take_item()
-				return itemstack
-			end
-		end,
-	})
+		if player:find("[gG]uest") then
+			minetest.chat_send_player(player,"Guests cannot claim land")
+			return itemstack
+		end
+		
+		if ( pointed_thing.above.y < -200 ) then
+			minetest.chat_send_player(player,"You cannot claim below -200")
+			return itemstack
+		end
+		
+		if owner then
+			minetest.chat_send_player(player, "This area is already owned by "..owner)
+		else
+			minetest.env:remove_node(pointed_thing.above)
+			chunk = landrush.get_chunk(pointed_thing.above)
+			landrush.claims[chunk] = {owner=placer:get_player_name(),shared={},claimtype="landclaim"}
+			landrush.save_claims()
+			-- showarea
+			local entpos = landrush.get_chunk_center(pointed_thing.above)
+			entpos.y = (pointed_thing.above.y-1)
+			minetest.env:add_entity(entpos, "landrush:showarea")
+			-- showarea
+			minetest.chat_send_player(landrush.claims[chunk].owner, "You now own the area inside the boundaries you see. Higlights will disappear shortly.")
+			itemstack:take_item()
+			return itemstack
+		end
+	end,
+})
 
 minetest.register_craft({
 			output = 'landrush:landclaim',
 			recipe = {
-				{'default:stone','default:steel_ingot','default:stone'},
+				{'default:stonebrick','default:steel_ingot','default:stonebrick'},
 				{'default:steel_ingot','default:mese_crystal','default:steel_ingot'},
-				{'default:stone','default:steel_ingot','default:stone'}
+				{'default:stonebrick','default:steel_ingot','default:stonebrick'}
 			}
 		})
 minetest.register_alias("landclaim", "landrush:landclaim")
@@ -108,14 +107,10 @@ if ( minetest.get_modpath("money2") ) then
 	dofile(path.."/landsale.lua")
 end
 
-minetest.after(0, function ()
-
-dofile(path.."/default.lua")
---dofile(path.."/bucket.lua")
+--dofile(path.."/default.lua")
 dofile(path.."/doors.lua")
 dofile(path.."/fire.lua")
 dofile(path.."/chatcommands.lua")
 --dofile(path.."/screwdriver.lua")
 dofile(path.."/snow.lua")
-
-end )
+print( string.format('[landrush] loaded after ca. %.2fs', os.clock() - load_time_start) )
