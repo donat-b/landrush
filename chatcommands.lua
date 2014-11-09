@@ -1,5 +1,19 @@
+core.register_chatcommand( 'ownerhud', {
+	params = '',
+	description = 'hides or shows owner hud',
+	privs = { interact=true },
+	func = function( name, param )
+		local player = core.get_player_by_name(name)
+		if landrush.hud_destroy( player ) then
+			return true, 'Owner HUD hidden'
+		else
+			landrush.hud_init( player )
+			return true, 'Owner HUD shown'
+		end
+	end,
+})
 
-minetest.register_chatcommand("landowner", {
+core.register_chatcommand( 'landowner', {
 	params = "",
 	description = "tells the owner of the current map chunk",
 	privs = {interact=true},
@@ -41,11 +55,12 @@ minetest.register_chatcommand("unclaim", {
 		local pos = player:getpos()
 		local owner = landrush.get_owner(pos)
 		local inv = player:get_inventory()
-		if owner then						
+		if owner then
 			if owner == name or minetest.check_player_privs(name, {landrush=true}) then
 				chunk = landrush.get_chunk(pos)
 					landrush.claims[chunk] = nil
 					landrush.save_claims()
+					inv:add_item('main', 'landrush:landclaim')
 					minetest.chat_send_player(name, "You renounced your claim on this area.")
 			else
 				minetest.chat_send_player(name, "This area is owned by "..owner)
@@ -53,6 +68,30 @@ minetest.register_chatcommand("unclaim", {
 		else
 			minetest.chat_send_player(name, "This area is unowned.")
 		end
+	end,
+})
+
+minetest.register_chatcommand("claim", {
+	params = '[name]',
+	description = "claims the current map chunk",
+	privs = {landrush=true},
+	func = function(name, param)
+		local player = minetest.env:get_player_by_name(name)
+		local pos = player:getpos()
+		
+		if ( param == '' and player ~= nil ) then
+			owner = name
+		elseif ( minetest.env:get_player_by_name(param) ~= nil ) then
+			owner = param
+		else
+			minetest.chat_send_player(name, 'No such player')
+			return
+		end
+		
+		chunk = landrush.get_chunk(pos)
+		landrush.claims[chunk] = { owner=owner, shared={}, claimtype="landclaim" }
+		landrush.save_claims()
+		minetest.chat_send_player(name, 'This area is owned by '..owner)
 	end,
 })
 
@@ -136,10 +175,10 @@ minetest.register_chatcommand("showarea", {
 	privs = {interact=true},
 	func = function(name, param)
 		local player = minetest.env:get_player_by_name(name)
-		local pos = player:getpos()		
+		local pos = player:getpos()
 				local entpos = landrush.get_chunk_center(pos)
 				entpos.y = (pos.y-1)
-				minetest.env:add_entity(entpos, "landrush:showarea")	
+				minetest.env:add_entity(entpos, "landrush:showarea")
 	end,
 })
 
