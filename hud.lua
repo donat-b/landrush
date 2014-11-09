@@ -16,12 +16,12 @@ function landrush.hud_init( player )
 			position = { x=0, y=0.98 },
 			text = 'landrush_gui_bg.png',
 			alignment = { x=1, y=0.96 },
-			scale = { x = -35.6, y = -7 }
+			scale = { x = -34.6, y = -7 }
 		}),
 		hud_bg2 = player:hud_add({
 			hud_elem_type = 'image',
 			name = 'LRbackground',
-			position = { x=0.64, y=0.98 },
+			position = { x=0.67, y=0.98 },
 			text = 'landrush_gui_bg.png',
 			alignment = { x=1, y=0.96 },
 			scale = { x = -100, y = -7 }
@@ -30,7 +30,7 @@ function landrush.hud_init( player )
 			hud_elem_type = 'text',
 			number = 0xFFFFFF,
 			name = 'LandOwner',
-			position = { x=0.1, y=0.983 },
+			position = { x=0.09, y=0.983 },
 			text = HUD_PREFIX,
 			alignment = { x=1, y=1 },
 			offset = { x = 0, y = -4 },
@@ -39,7 +39,7 @@ function landrush.hud_init( player )
 			hud_elem_type = 'text',
 			number = 0xFFFFFF,
 			name = 'LRShared',
-			position = { x=0.65, y=0.983 },
+			position = { x=0.68, y=0.983 },
 			text = SHARED_PREFIX,
 			alignment = { x=1, y=1 },
 			offset = { x = 0, y = -4 },
